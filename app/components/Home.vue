@@ -38,10 +38,11 @@ import * as http from "@nativescript/core/http";
         this.loading = true
         var tweets = await http.getJSON("https://webservices.cyou/1").then(result => {
         this.tweets = result;
+        this.generatedVisible = true;
         }, error => {
             alert('Oops, unable to get tweet. Please Check Internet Connection');
                 console.log(error);
-            }).finally(() => (this.loading = false));
+            }).finally(() => (this.loading = false, setTimeout(() => (this.generatedVisible = false), 1000)));
         },
     }
 };
