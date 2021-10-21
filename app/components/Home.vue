@@ -1,41 +1,71 @@
 <template>
     <Page>
         <ActionBar>
-            <Label text="Home"/>
+            <Label text="Postshare"/>
         </ActionBar>
-
-        <GridLayout>
-            <Label class="info">
-                <FormattedString>
-                    <Span class="fas" text.decode="&#xf135; "/>
-                    <Span :text="message"/>
-                </FormattedString>
-            </Label>
-        </GridLayout>
+        <StackLayout >
+             <ListView height="50%" for="tweet in tweets" class="list-group">
+                <v-template>
+                    <StackLayout class="list-group-item" height="100%">
+                        <TextView :text="tweet.tweet" class="h2" height="100%"/>
+                    </StackLayout>
+                </v-template>
+            </ListView>
+            <ActivityIndicator :busy="loading"/>
+            <Button height="auto" class="button generate" text="GENERATE"
+                @tap="dataFetch" />
+            <AbsoluteLayout  height="auto"
+                backgroundColor="lightgray" class="absolute">
+                <Label left="10" width="100" class="toast-lable"  v-if="generatedVisible"
+                  text="generated" />
+            </AbsoluteLayout>
+        </StackLayout>
     </Page>
 </template>
-
 <script>
+import * as http from "@nativescript/core/http";
   export default {
-    computed: {
-      message() {
-        return "Blank {N}-Vue app";
-      }
+    data() {
+        return {
+        tweets:[{"tweet":"Please wait... The Server is experiencing numerous requests."}],
+        text:"",
+        generatedVisible: false,
+        loading :false
+        };
+    },
+    methods: {
+        async dataFetch(){
+        this.loading = true
+        var tweets = await http.getJSON("https://webservices.cyou/1").then(result => {
+        this.tweets = result;
+        }, error => {
+            alert('Oops, unable to get tweet. Please Check Internet Connection');
+                console.log(error);
+            }).finally(() => (this.loading = false));
+        },
     }
-  };
+};
 </script>
-
 <style scoped lang="scss">
     @import '@nativescript/theme/scss/variables/blue';
-
-    // Custom styles
-    .fas {
-        @include colorize($color: accent);
+    ActionBar {
+        background-color: #56aded;
+        color: #ffffff;
     }
-
-    .info {
-        font-size: 20;
-        horizontal-align: center;
-        vertical-align: center;
+    .button{
+        font-size:18;
+        border-radius:30;
+    }
+    .absolute{
+        width: 200;
+        height: auto;
+        text-align: right;
+        color: white;
+        max-width: 130px;
+        border-radius: 25px;
+    }
+    .toast-lable{
+        text-align: center;
+        padding: 15;
     }
 </style>
